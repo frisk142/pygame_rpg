@@ -2,6 +2,7 @@ import pygame
 import sys
 from mygame_RPG.scene.world_scene import world_scene
 from mygame_RPG.scene.battle_scene import Battle_scene
+from mygame_RPG.entities.player import create_player
 
 def main():
     pygame.init() # 初始化
@@ -9,7 +10,8 @@ def main():
     clock = pygame.time.Clock() # 时间和电脑时间绑定，创建时钟对象
 
     # 初始状态：探索场景
-    current_scene = world_scene() # 创建探索场景实例，赋值当前场景
+    player = create_player(400,400)
+    current_scene = world_scene(player) # 创建探索场景实例，赋值当前场景
 
     running = True
     while running:

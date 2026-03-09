@@ -13,6 +13,16 @@ class Player(pygame.sprite.Sprite): # 定义一个名为player的自定义类，
         self.screen_width = 800
         self.screen_height = 800
 
+        # 关键玩家属性
+        self.gold = 100
+        self.hp = 100
+        self.max_hp = 100
+        self.mp = 100
+        self.max_mp = 100
+        self.attack = 10
+        self.defense = 10
+        self.items = []
+
     def update(self,keys):
         # 角色运动逻辑
         if keys[pygame.K_a]:
@@ -32,3 +42,9 @@ class Player(pygame.sprite.Sprite): # 定义一个名为player的自定义类，
             self.rect.top = 0
         if self.rect.bottom > self.screen_height:
             self.rect.bottom = self.screen_height
+
+player_instance = None
+def create_player(x = 400,y = 400):
+    global player_instance
+    player_instance = Player(x,y)
+    return player_instance
