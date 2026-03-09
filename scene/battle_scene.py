@@ -3,7 +3,8 @@ import random
 from mygame_RPG.entities.player_items import Item
 
 
-class Battle_scene:
+class \
+        Battle_scene:
     def __init__(self,encountered_enemy):
         self.enemy = encountered_enemy # 怪物信息
         self.enemy.name = "堕落骑士"
