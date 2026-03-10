@@ -11,7 +11,7 @@ def main():
 
     # 初始状态：探索场景
     player = create_player(400,400)
-    current_scene = world_scene(player) # 创建探索场景实例，赋值当前场景
+    current_scene = world_scene() # 创建探索场景实例，赋值当前场景
 
     running = True
     while running:

@@ -1,11 +1,11 @@
 import pygame
-from mygame_RPG.entities.player import Player
+from mygame_RPG.entities.player import get_player
 from mygame_RPG.entities.Enemy import Enemy
 
 class world_scene:
     def __init__ (self):
         self.all_sprites = pygame.sprite.Group() # 创建一个精灵组
-        self.player = Player(400,400) # 创建主角
+        self.player = get_player() # 创建主角
         self.all_sprites.add(self.player) # 添加主角到精灵分类
 
         self.enemy = Enemy(200,200) # 放置敌人

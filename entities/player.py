@@ -48,3 +48,6 @@ def create_player(x = 400,y = 400):
     global player_instance
     player_instance = Player(x,y)
     return player_instance
+
+def get_player():
+    return player_instance

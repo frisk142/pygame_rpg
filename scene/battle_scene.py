@@ -1,7 +1,7 @@
 import pygame
 import random
 from mygame_RPG.entities.player_items import Item
-from mygame_RPG.entities.player import Player
+from mygame_RPG.entities.player import get_player
 
 
 class \
@@ -9,7 +9,8 @@ class \
     def __init__(self,encountered_enemy):
         self.enemy = encountered_enemy # 怪物信息
         self.enemy.name = "堕落骑士"
-        self.player_hp = Player.hp # 玩家血量
+        player = get_player()
+        self.player_hp = player.hp # 玩家血量
         self.enemy_hp = 80 # 怪物血量
         self.player_Energy =100  # 蓝量
 
