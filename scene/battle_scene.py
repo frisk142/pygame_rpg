@@ -9,14 +9,12 @@ class \
     def __init__(self,encountered_enemy):
         self.enemy = encountered_enemy # 怪物信息
         self.enemy.name = "堕落骑士"
-        player = get_player()
-        self.player_hp = player.hp # 玩家血量
+        self.player = get_player()
         self.enemy_hp = 80 # 怪物血量
-        self.player_Energy =100  # 蓝量
 
-        self.display_player_hp = self.player_hp # 用于显示缓降落的ui条
+        self.display_player_hp = self.player.hp # 用于显示缓降落的ui条
         self.display_enemy_hp = self.enemy_hp
-        self.display_player_Energy = self.player_Energy
+        self.display_player_mp = self.player.mp
 
         # 战斗内部状态机
         self.battle_state = "PLAYER_TURN" # 初始为玩家回合
@@ -55,9 +53,8 @@ class \
         self.battle_ended = False
 
         # 创建金币奖励
-        self.player_Gold_coins = 100  # 玩家初始金币
         self.enemy_Gold_coins = random.randint(10,30) # 敌人身上携带的金币
-        self.display_Gold_coins = self.player_Gold_coins # 用于显示的金币
+        self.display_Gold_coins = self.player.gold # 用于显示的金币
 
 
     def add_dialog_message(self,message):
@@ -145,16 +142,16 @@ class \
         skill_name = self.skills_menu[self.skills_index]
         print(f"玩家使用了技能{skill_name}")
         self.add_dialog_message(f"使用了{skill_name}!!!")
-        if self.player_Energy <= 0:
+        if self.player.mp <= 0:
             self.add_dialog_message("蓝量不够，无法使用技能")
 
         elif skill_name == "火球术":
             damage = 50
             player_mp = 20
-            self.player_Energy -= player_mp
+            self.player.mp -= player_mp
             self.enemy_hp -= damage
             self.add_dialog_message(f"火球术造成了{damage}点伤害！敌人剩余{max(self.enemy_hp,0)}")
-            print(f"现在还剩的mp： {self.player_Energy}")
+            print(f"现在还剩的mp： {self.player.mp}")
             self.enemy_hp = max(self.enemy_hp,0)
             self.damage_state = "PLAYER_DAMAGE"
             self.damage_display_timer =pygame.time.get_ticks()
@@ -162,11 +159,11 @@ class \
         elif skill_name == "治疗术":
             heal_amount = 40
             player_mp = 20
-            self.player_Energy -= player_mp
-            self.player_hp += heal_amount
-            self.add_dialog_message(f"玩家使用了治疗术，回复了{heal_amount}点血量! 玩家剩余血量{max(self.player_hp,0)}")
+            self.player.mp -= player_mp
+            self.player.hp += heal_amount
+            self.add_dialog_message(f"玩家使用了治疗术，回复了{heal_amount}点血量! 玩家剩余血量{max(self.player.hp,0)}")
             self.enemy_hp = max(self.enemy_hp,0)
-            self.player_hp = min(self.player_hp,100)
+            self.player.hp = min(self.player.hp,100)
             self.damage_state = "PLAYER_DAMAGE"
             self.damage_display_timer = pygame.time.get_ticks()
 
@@ -174,7 +171,7 @@ class \
             # 群体技能，放个单个伤害占位
             damage = 50
             player_mp = 40
-            self.player_Energy -= player_mp
+            self.player.mp -= player_mp
             self.enemy_hp -= damage
             self.add_dialog_message(f"玩家使用了闪电球，造成了{damage}点伤害，敌人剩余血量为{max(self.enemy_hp,0)}")
             self.enemy_hp = max(self.enemy_hp, 0)
@@ -184,10 +181,10 @@ class \
         elif skill_name == "喷射火焰":
             damage = 999999
             player_damage = 0.1
-            self.player_hp = int(self.player_hp * player_damage)
+            self.player.hp = int(self.player.hp * player_damage)
             self.enemy_hp -= damage
             self.add_dialog_message(f"玩家使用了喷射火焰造成了{damage}点伤害！！")
-            print(f"玩家剩余血量{self.player_hp}")
+            print(f"玩家剩余血量{self.player.hp}")
             self.enemy_hp = max(self.enemy_hp, 0)
             self.damage_state = "PLAYER_DAMAGE"
             self.damage_display_timer = pygame.time.get_ticks()
@@ -209,24 +206,24 @@ class \
             # 只降敌人血条（玩家造成的伤害）
         if self.display_enemy_hp > self.enemy_hp:
             self.display_enemy_hp -= int(max(1, (self.display_enemy_hp - self.enemy_hp) * 0.2))
-        if self.display_player_hp > self.player_hp:
-            self.display_player_hp -= int(max(1, (self.display_player_hp - self.player_hp) * 0.2))
+        if self.display_player_hp > self.player.hp:
+            self.display_player_hp -= int(max(1, (self.display_player_hp - self.player.hp) * 0.2))
 
             # 只降玩家血条（敌人造成的伤害）
-        if self.display_player_hp > self.player_hp:
-            self.display_player_hp -= int(max(1, (self.display_player_hp - self.player_hp) * 0.2))
+        if self.display_player_hp > self.player.hp:
+            self.display_player_hp -= int(max(1, (self.display_player_hp - self.player.hp) * 0.2))
         if self.display_enemy_hp > self.enemy_hp:
             self.display_enemy_hp -= int(max(1, (self.display_enemy_hp - self.enemy_hp) * 0.2))
 
             # 没有伤害显示时，可以同时缓降
-        if self.display_player_hp > self.player_hp:
-            self.display_player_hp -= int(max(1, (self.display_player_hp - self.player_hp) * 0.2))
-        elif self.display_player_hp < self.player_hp:
-            self.display_player_hp += int(max(1, (self.player_hp - self.display_player_hp) * 0.2))
+        if self.display_player_hp > self.player.hp:
+            self.display_player_hp -= int(max(1, (self.display_player_hp - self.player.hp) * 0.2))
+        elif self.display_player_hp < self.player.hp:
+            self.display_player_hp += int(max(1, (self.player.hp - self.display_player_hp) * 0.2))
 
         # MP条缓降（一直进行）
-        if self.display_player_Energy > self.player_Energy:
-           self.display_player_Energy -= int(max(1, (self.display_player_Energy - self.player_Energy) * 0.2))
+        if self.display_player_mp > self.player.mp:
+           self.display_player_mp -= int(max(1, (self.display_player_mp - self.player.mp) * 0.2))
 
         # 胜负判断
         if not self.battle_ended:
@@ -239,7 +236,7 @@ class \
                 self.add_dialog_message("战斗胜利\n点击回车返回主世界")
 
 
-            elif self.player_hp <= 0 :
+            elif self.player.hp <= 0 :
                 self.battle_state = "DEFEAT"
                 self.battle_ended = True
                 print("战斗失败...\n胜败乃兵家常事，少侠请重新来过")
@@ -271,8 +268,8 @@ class \
                 self.add_dialog_message("敌人回合开始")
                 if self.last_action == "防御":
                     enemy_damage = int(enemy_damage * 0.5)
-                self.player_hp -= enemy_damage
-                self.add_dialog_message(f"敌人对你造成了{enemy_damage}点伤害，玩家剩余hp为{self.player_hp}")
+                self.player.hp -= enemy_damage
+                self.add_dialog_message(f"敌人对你造成了{enemy_damage}点伤害，玩家剩余hp为{self.player.hp}")
 
                 self.enemy_turn_start_time = 0
 
@@ -307,7 +304,7 @@ class \
 
         player_text = self.font.render(f"玩家 HP：{int(self.display_player_hp)}",True,(255,255,255))
         enemy_text = self.font.render(f"敌人 HP：{int(self.display_enemy_hp)}",True,(255,255,255))
-        player_enemy_txt = self.font.render(f"玩家 MP：{int(self.display_player_Energy)}",True,(255,255,255))
+        player_enemy_txt = self.font.render(f"玩家 MP：{int(self.display_player_mp)}",True,(255,255,255))
         screen.blit(player_text,(50,50))
         screen.blit(enemy_text,(550,50))
         screen.blit(player_enemy_txt,(50,150))
@@ -344,7 +341,7 @@ class \
         player_energy_y = 130
         # 玩家蓝条位置与绘制
         pygame.draw.rect(screen, (0, 255, 128), (player_energy_x, player_energy_y, player_energy_width, player_energy_height))
-        energy_current_width = (self.display_player_Energy / 100) * player_energy_width
+        energy_current_width = (self.display_player_mp / 100) * player_energy_width
         pygame.draw.rect(screen, (0, 255, 255), (player_energy_x, player_energy_y, energy_current_width, player_energy_height))
         pygame.draw.rect(screen, (255, 255, 255), (player_energy_x, player_energy_y, player_energy_width, player_energy_height), 2)
 
