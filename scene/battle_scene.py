@@ -2,12 +2,13 @@ import pygame
 import random
 from mygame_RPG.entities.player_items import Item
 from mygame_RPG.entities.player import get_player
+from mygame_RPG.entities.Enemy import get_Enemy
 
 
 class \
         Battle_scene:
     def __init__(self,encountered_enemy):
-        self.enemy = encountered_enemy # 怪物信息
+        self.enemy = get_Enemy() # 怪物信息
         self.enemy.name = "堕落骑士"
         self.player = get_player()
         self.enemy_hp = 80 # 怪物血量
@@ -230,7 +231,7 @@ class \
             if self.enemy_hp <= 0 :
                 self.battle_state = "VICTORY"
                 self.battle_ended = True
-                self.player_Gold_coins += self.enemy_Gold_coins
+                self.player.gold += self.enemy_Gold_coins
                 print(f"战斗胜利！ 获得了{self.enemy_Gold_coins}金币")
                 self.add_dialog_message(f"获得了{self.enemy_Gold_coins}个金币")
                 self.add_dialog_message("战斗胜利\n点击回车返回主世界")
