@@ -8,7 +8,7 @@ from mygame_RPG.entities.Enemy import create_enemy
 class \
         Battle_scene:
     def __init__(self,encountered_enemy):
-        self.enemy = create_enemy # 怪物信息
+        self.enemy = create_enemy() # 怪物信息
         self.player = get_player()
 
         self.display_player_hp = self.player.hp # 用于显示缓降落的ui条
@@ -238,7 +238,8 @@ class \
                 self.battle_state = "DEFEAT"
                 self.battle_ended = True
                 print("战斗失败...\n胜败乃兵家常事，少侠请重新来过")
-                self.add_dialog_message("战斗失败...\n胜败乃兵家常事，少侠请重新来过\n点击回车返回主世界")
+                self.add_dialog_message("战斗失败...胜败乃兵家常事，少侠请重新来过")
+                self.add_dialog_message("点击回车返回主世界")
 
         # 处理伤害显示状态
         if self.battle_ended:
@@ -266,7 +267,7 @@ class \
                 if self.last_action == "防御":
                     self.enemy.damage = int(self.enemy.damage * 0.5)
                 self.player.hp -= self.enemy.damage
-                self.add_dialog_message(f"敌人对你造成了{self.enemy.damage}点伤害，玩家剩余hp为{self.player.hp}")
+                self.add_dialog_message(f"敌人对你造成了{self.enemy.damage}点伤害，玩家剩余hp为{max(0,self.player.hp)}")
 
                 self.enemy_turn_start_time = 0
 
@@ -299,7 +300,7 @@ class \
 
         screen.fill((30,20,40))
 
-        player_text = self.font.render(f"玩家 HP：{int(self.display_player_hp)}",True,(255,255,255))
+        player_text = self.font.render(f"玩家 HP：{max(0,int(self.display_player_hp))}",True,(255,255,255))
         enemy_text = self.font.render(f"敌人 HP：{int(self.display_enemy_hp)}",True,(255,255,255))
         player_enemy_txt = self.font.render(f"玩家 MP：{int(self.display_player_mp)}",True,(255,255,255))
         screen.blit(player_text,(50,50))

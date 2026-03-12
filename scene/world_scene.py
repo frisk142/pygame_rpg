@@ -1,6 +1,6 @@
 import pygame
 from mygame_RPG.entities.player import get_player
-from mygame_RPG.entities.Enemy import Enemy
+from mygame_RPG.entities.Enemy import create_enemy
 
 class world_scene:
     def __init__ (self):
@@ -8,7 +8,7 @@ class world_scene:
         self.player = get_player() # 创建主角
         self.all_sprites.add(self.player) # 添加主角到精灵分类
 
-        self.enemy = Enemy(200,200) # 放置敌人
+        self.enemy = create_enemy() # 放置敌人
         self.all_sprites.add(self.enemy) # 添加敌人至精灵分类
 
         self.encountered_enemy = None # 记录碰到了谁
@@ -19,9 +19,10 @@ class world_scene:
         self.enemy.update()
 
         # 碰撞检测
-
         if pygame.sprite.collide_rect(self.player, self.enemy):
             self.encountered_enemy = self.enemy
+            if self.player.hp <= 0:
+                return None
             return "to_battle"
         return None
 
