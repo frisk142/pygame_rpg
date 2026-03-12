@@ -2,7 +2,7 @@ import pygame
 import random
 from mygame_RPG.entities.player_items import Item
 from mygame_RPG.entities.player import get_player
-from mygame_RPG.entities.Enemy import get_Enemy
+from mygame_RPG.entities.Enemy import create_enemy
 
 
 class \
