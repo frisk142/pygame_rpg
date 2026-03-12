@@ -8,13 +8,11 @@ from mygame_RPG.entities.Enemy import create_enemy
 class \
         Battle_scene:
     def __init__(self,encountered_enemy):
-        self.enemy = get_Enemy() # 怪物信息
-        self.enemy.name = "堕落骑士"
+        self.enemy = create_enemy # 怪物信息
         self.player = get_player()
-        self.enemy_hp = 80 # 怪物血量
 
         self.display_player_hp = self.player.hp # 用于显示缓降落的ui条
-        self.display_enemy_hp = self.enemy_hp
+        self.display_enemy_hp = self.enemy.hp
         self.display_player_mp = self.player.mp
 
         # 战斗内部状态机
@@ -54,7 +52,6 @@ class \
         self.battle_ended = False
 
         # 创建金币奖励
-        self.enemy_Gold_coins = random.randint(10,30) # 敌人身上携带的金币
         self.display_Gold_coins = self.player.gold # 用于显示的金币
 
 
@@ -107,10 +104,10 @@ class \
 
         if action == "攻击": # 简单的伤害计算
             damage = 20
-            self.enemy_hp -= damage
-            print(f"对敌人造成了{damage}点伤害！，敌人剩余hp{self.enemy_hp}")
-            self.add_dialog_message(f"对敌人造成了{damage}点伤害！，敌人剩余hp{max(self.enemy_hp,0)}")
-            self.enemy_hp = max(self.enemy_hp,0)
+            self.enemy.hp -= damage
+            print(f"对敌人造成了{damage}点伤害！，敌人剩余hp{self.enemy.hp}")
+            self.add_dialog_message(f"对敌人造成了{damage}点伤害！，敌人剩余hp{max(self.enemy.hp,0)}")
+            self.enemy.hp = max(self.enemy.hp,0)
             self.damage_state = "PLAYER_DAMAGE"
             self.damage_display_timer = pygame.time.get_ticks()
             self.battle_state = "ENEMY_TURN"
@@ -150,10 +147,10 @@ class \
             damage = 50
             player_mp = 20
             self.player.mp -= player_mp
-            self.enemy_hp -= damage
-            self.add_dialog_message(f"火球术造成了{damage}点伤害！敌人剩余{max(self.enemy_hp,0)}")
+            self.enemy.hp -= damage
+            self.add_dialog_message(f"火球术造成了{damage}点伤害！敌人剩余{max(self.enemy.hp,0)}")
             print(f"现在还剩的mp： {self.player.mp}")
-            self.enemy_hp = max(self.enemy_hp,0)
+            self.enemy.hp = max(self.enemy.hp,0)
             self.damage_state = "PLAYER_DAMAGE"
             self.damage_display_timer =pygame.time.get_ticks()
 
@@ -163,7 +160,7 @@ class \
             self.player.mp -= player_mp
             self.player.hp += heal_amount
             self.add_dialog_message(f"玩家使用了治疗术，回复了{heal_amount}点血量! 玩家剩余血量{max(self.player.hp,0)}")
-            self.enemy_hp = max(self.enemy_hp,0)
+            self.enemy.hp = max(self.enemy.hp,0)
             self.player.hp = min(self.player.hp,100)
             self.damage_state = "PLAYER_DAMAGE"
             self.damage_display_timer = pygame.time.get_ticks()
@@ -173,9 +170,9 @@ class \
             damage = 50
             player_mp = 40
             self.player.mp -= player_mp
-            self.enemy_hp -= damage
-            self.add_dialog_message(f"玩家使用了闪电球，造成了{damage}点伤害，敌人剩余血量为{max(self.enemy_hp,0)}")
-            self.enemy_hp = max(self.enemy_hp, 0)
+            self.enemy.hp -= damage
+            self.add_dialog_message(f"玩家使用了闪电球，造成了{damage}点伤害，敌人剩余血量为{max(self.enemy.hp,0)}")
+            self.enemy.hp = max(self.enemy.hp, 0)
             self.damage_state = "PLAYER_DAMAGE"
             self.damage_display_timer = pygame.time.get_ticks()
 
@@ -183,10 +180,10 @@ class \
             damage = 999999
             player_damage = 0.1
             self.player.hp = int(self.player.hp * player_damage)
-            self.enemy_hp -= damage
+            self.enemy.hp -= damage
             self.add_dialog_message(f"玩家使用了喷射火焰造成了{damage}点伤害！！")
             print(f"玩家剩余血量{self.player.hp}")
-            self.enemy_hp = max(self.enemy_hp, 0)
+            self.enemy.hp = max(self.enemy.hp, 0)
             self.damage_state = "PLAYER_DAMAGE"
             self.damage_display_timer = pygame.time.get_ticks()
         return None
@@ -205,16 +202,16 @@ class \
         # 血条缓降逻辑（现在根据damage_state决定先降哪个）
 
             # 只降敌人血条（玩家造成的伤害）
-        if self.display_enemy_hp > self.enemy_hp:
-            self.display_enemy_hp -= int(max(1, (self.display_enemy_hp - self.enemy_hp) * 0.2))
+        if self.display_enemy_hp > self.enemy.hp:
+            self.display_enemy_hp -= int(max(1, (self.display_enemy_hp - self.enemy.hp) * 0.2))
         if self.display_player_hp > self.player.hp:
             self.display_player_hp -= int(max(1, (self.display_player_hp - self.player.hp) * 0.2))
 
             # 只降玩家血条（敌人造成的伤害）
         if self.display_player_hp > self.player.hp:
             self.display_player_hp -= int(max(1, (self.display_player_hp - self.player.hp) * 0.2))
-        if self.display_enemy_hp > self.enemy_hp:
-            self.display_enemy_hp -= int(max(1, (self.display_enemy_hp - self.enemy_hp) * 0.2))
+        if self.display_enemy_hp > self.enemy.hp:
+            self.display_enemy_hp -= int(max(1, (self.display_enemy_hp - self.enemy.hp) * 0.2))
 
             # 没有伤害显示时，可以同时缓降
         if self.display_player_hp > self.player.hp:
@@ -228,12 +225,12 @@ class \
 
         # 胜负判断
         if not self.battle_ended:
-            if self.enemy_hp <= 0 :
+            if self.enemy.hp <= 0 :
                 self.battle_state = "VICTORY"
                 self.battle_ended = True
-                self.player.gold += self.enemy_Gold_coins
-                print(f"战斗胜利！ 获得了{self.enemy_Gold_coins}金币")
-                self.add_dialog_message(f"获得了{self.enemy_Gold_coins}个金币")
+                self.player.gold += self.enemy.gold
+                print(f"战斗胜利！ 获得了{self.enemy.gold}金币")
+                self.add_dialog_message(f"获得了{self.enemy.gold}个金币")
                 self.add_dialog_message("战斗胜利\n点击回车返回主世界")
 
 
@@ -253,7 +250,7 @@ class \
                 if self.damage_state == "PLAYER_DAMAGE":
                     self.battle_state = "ENEMY_TURN"
                     self.damage_state = "NONE"
-                elif self.damage_state == "ENEMY_DAMAGE":
+                elif self.damage_state == "self.enemy.damage":
                     self.battle_state ="PLAYER_TURN"
                     self.last_action = None
                     self.damage_state = "NONE"
@@ -265,18 +262,17 @@ class \
             current_time = pygame.time.get_ticks()
             elapsed_time = current_time - self.enemy_turn_start_time
             if elapsed_time >= self.enemy_turn_delay:
-                enemy_damage = 20 # 敌人基础伤害
                 self.add_dialog_message("敌人回合开始")
                 if self.last_action == "防御":
-                    enemy_damage = int(enemy_damage * 0.5)
-                self.player.hp -= enemy_damage
-                self.add_dialog_message(f"敌人对你造成了{enemy_damage}点伤害，玩家剩余hp为{self.player.hp}")
+                    self.enemy.damage = int(self.enemy.damage * 0.5)
+                self.player.hp -= self.enemy.damage
+                self.add_dialog_message(f"敌人对你造成了{self.enemy.damage}点伤害，玩家剩余hp为{self.player.hp}")
 
                 self.enemy_turn_start_time = 0
 
                 # 敌人回合结束后切换为玩家回合
                 # entities.battle_state = "PLAYER_TURN"
-                self.damage_state = "ENEMY_DAMAGE"
+                self.damage_state = "self.enemy.damage"
                 self.damage_display_timer = pygame.time.get_ticks()
                 # entities.last_action = None
 
