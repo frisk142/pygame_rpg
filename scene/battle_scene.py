@@ -3,6 +3,8 @@ import random
 from mygame_RPG.entities.player_items import Item
 from mygame_RPG.entities.player import get_player
 from mygame_RPG.entities.Enemy import create_enemy
+from mygame_RPG.entities.player_skill import DamageSkill
+from mygame_RPG.data.skill_data import SKILLS
 
 
 class \
@@ -22,7 +24,7 @@ class \
 
         # 菜单相关
         self.menu_options = ["攻击","技能","防御","逃跑","道具"]
-        self.skills_menu = ["火球术","治疗术","闪电球","喷射火焰"]
+        self.skills_menu = list(SKILLS.keys())
 
 
         self.selected_index = 0 # 主菜单当前选中索引,
@@ -138,55 +140,23 @@ class \
     def use_selected_skill(self):
         """使用选中的技能"""
         skill_name = self.skills_menu[self.skills_index]
-        print(f"玩家使用了技能{skill_name}")
-        self.add_dialog_message(f"使用了{skill_name}!!!")
-        if self.player.mp <= 0:
-            self.add_dialog_message("蓝量不够，无法使用技能")
+        skill = SKILLS.get(skill_name) # 从data文件获取技能对象
+        if skill is None:
+            self.add_dialog_message(f"错误：没找不到技能{skill_name}")
+            return
+        # 检测mp是否不足
+        if not skill.can_use(self.player):
+            self.add_dialog_message("MP不足")
+            return
+        # 使用技能，得到返回值
+        success,msg = skill.use(self.player,self.enemy)
+        self.add_dialog_message(msg)
+        # 更新伤害显示状态
+        self.damage_state = "PLAYER_DAMAGE"
+        self.damage_display_timer = pygame.time.get_ticks()
+        self.battle_state = "ENEMY_TURN"
 
-        elif skill_name == "火球术":
-            damage = 50
-            player_mp = 20
-            self.player.mp -= player_mp
-            self.enemy.hp -= damage
-            self.add_dialog_message(f"火球术造成了{damage}点伤害！敌人剩余{max(self.enemy.hp,0)}")
-            print(f"现在还剩的mp： {self.player.mp}")
-            self.enemy.hp = max(self.enemy.hp,0)
-            self.damage_state = "PLAYER_DAMAGE"
-            self.damage_display_timer =pygame.time.get_ticks()
 
-        elif skill_name == "治疗术":
-            heal_amount = 40
-            player_mp = 20
-            self.player.mp -= player_mp
-            self.player.hp += heal_amount
-            self.add_dialog_message(f"玩家使用了治疗术，回复了{heal_amount}点血量! 玩家剩余血量{max(self.player.hp,0)}")
-            self.enemy.hp = max(self.enemy.hp,0)
-            self.player.hp = min(self.player.hp,100)
-            self.damage_state = "PLAYER_DAMAGE"
-            self.damage_display_timer = pygame.time.get_ticks()
-
-        elif skill_name == "闪电球":
-            # 群体技能，放个单个伤害占位
-            damage = 50
-            player_mp = 40
-            self.player.mp -= player_mp
-            self.enemy.hp -= damage
-            self.add_dialog_message(f"玩家使用了闪电球，造成了{damage}点伤害，敌人剩余血量为{max(self.enemy.hp,0)}")
-            self.enemy.hp = max(self.enemy.hp, 0)
-            self.damage_state = "PLAYER_DAMAGE"
-            self.damage_display_timer = pygame.time.get_ticks()
-
-        elif skill_name == "喷射火焰":
-            damage = 999999
-            player_damage = 0.1
-            self.player.hp = int(self.player.hp * player_damage)
-            self.enemy.hp -= damage
-            self.add_dialog_message(f"玩家使用了喷射火焰造成了{damage}点伤害！！")
-            print(f"玩家剩余血量{self.player.hp}")
-            self.enemy.hp = max(self.enemy.hp, 0)
-            self.damage_state = "PLAYER_DAMAGE"
-            self.damage_display_timer = pygame.time.get_ticks()
-        return None
 
 
     def update(self):
