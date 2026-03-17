@@ -43,6 +43,7 @@ class Player(pygame.sprite.Sprite): # 定义一个名为player的自定义类，
         if self.rect.bottom > self.screen_height:
             self.rect.bottom = self.screen_height
 
+
 player_instance = None
 def create_player(x = 400,y = 400):
     global player_instance

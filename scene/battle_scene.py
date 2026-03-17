@@ -158,7 +158,6 @@ class \
 
 
 
-
     def update(self):
         """根据战斗状态更新逻辑"""
         if self.pending_scene_instruction:
@@ -274,7 +273,7 @@ class \
         enemy_text = self.font.render(f"敌人 HP：{int(self.display_enemy_hp)}",True,(255,255,255))
         player_enemy_txt = self.font.render(f"玩家 MP：{int(self.display_player_mp)}",True,(255,255,255))
         screen.blit(player_text,(50,50))
-        screen.blit(enemy_text,(550,50))
+        screen.blit(enemy_text,(500,50))
         screen.blit(player_enemy_txt,(50,150))
 
 
@@ -298,7 +297,7 @@ class \
         enemy_bar_y = 100
         # 敌人血条位置与绘制
         pygame.draw.rect(screen, (255, 0, 0), (enemy_bar_x, enemy_bar_y, enemy_bar_width, enemy_bar_height))
-        enemy_current_width = (self.display_enemy_hp / 80) * enemy_bar_width
+        enemy_current_width = (self.display_enemy_hp / self.enemy.max_hp) * enemy_bar_width
         pygame.draw.rect(screen, (0, 255, 0), (enemy_bar_x, enemy_bar_y, enemy_current_width, enemy_bar_height))
         pygame.draw.rect(screen, (255, 255, 255), (enemy_bar_x, enemy_bar_y, enemy_bar_width, enemy_bar_height), 2)
 
