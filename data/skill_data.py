@@ -1,6 +1,7 @@
 from mygame_RPG.entities.player_skill import DamageSkill
 from mygame_RPG.entities.player_skill import HealSkill
 from mygame_RPG.entities.player_skill import selfDamageSkill
+
 SKILLS = {
    "火球术" : DamageSkill("火球术",mp_cost = 20 ,damage = 40 ,description="对敌人释放火球，造成40点火球伤害") ,
    "治疗术" : HealSkill("治疗术",mp_cost = 40 , heal = 40 ,description="使用治疗术回复自己，回复40点生命值"),

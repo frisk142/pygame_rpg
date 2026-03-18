@@ -1,6 +1,7 @@
 import pygame
 from mygame_RPG.entities.player import get_player
 from mygame_RPG.entities.Enemy import create_enemy
+from mygame_RPG.scene.shop_scene import ShopEntrance
 
 class world_scene:
     def __init__ (self):
@@ -9,6 +10,8 @@ class world_scene:
         self.all_sprites.add(self.player) # 添加主角到精灵分类
 
         self.enemy = create_enemy() # 放置敌人
+        self.shop_scene = ShopEntrance(600,600)
+        self.all_sprites.add(self.shop_scene)
         self.all_sprites.add(self.enemy) # 添加敌人至精灵分类
 
         self.encountered_enemy = None # 记录碰到了谁
@@ -19,12 +22,18 @@ class world_scene:
         self.enemy.update()
 
         # 碰撞检测
-        if pygame.sprite.collide_rect(self.player, self.enemy):
+        if pygame.sprite.collide_rect(self.player, self.enemy,):
             self.encountered_enemy = self.enemy
             if self.player.hp <= 0:
                 return None
             return "to_battle"
+
+        if pygame.sprite.collide_rect(self.player, self.shop_scene):
+            self.encountered_shop_scene = self.shop_scene
+            return "to_shop"
+
         return None
+
 
     def draw(self,screen):
         screen.fill((100,100,200)) # 探索背景色

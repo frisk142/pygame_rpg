@@ -3,6 +3,7 @@ import sys
 from mygame_RPG.scene.world_scene import world_scene
 from mygame_RPG.scene.battle_scene import Battle_scene
 from mygame_RPG.entities.player import create_player
+from mygame_RPG.scene.shop_scene import ShopScene
 
 def main():
     pygame.init() # 初始化
@@ -32,6 +33,12 @@ def main():
         elif next_scene_request == "to_world":
             if isinstance(current_scene,Battle_scene):
                 current_scene = world_scene()
+        if next_scene_request == "to_shop":
+            if isinstance(current_scene,world_scene):
+                current_scene = ShopScene(player)
+        elif next_scene_request == "to_world":
+            current_scene = world_scene()
+
 
 
 

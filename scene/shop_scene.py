@@ -7,10 +7,19 @@ from mygame_RPG.entities.player_items import ManaItem
 from mygame_RPG.entities.player_items import StatBoostItem
 
 
+class ShopEntrance(pygame.sprite.Sprite): # 商店入口，创建商店精灵类
+    def __init__(self,x,y):
+        super().__init__()
+        self.image = pygame.Surface((60,60))
+        self.image.fill((0,255,0))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x,y)
+
+
 class ShopScene:
-    def __init__(self,player_state):
+    def __init__(self,player):
         # 玩家状态引用
-        self.player = Player #
+        self.player = player
         # 字体
         font_path = r"C:\Windows\Fonts\simsun.ttc"
         self.title_font = pygame.font.Font(font_path,48)
@@ -29,12 +38,12 @@ class ShopScene:
         title = self.title_font.render("商店",True,(255,210,0)) # 标题
         screen.blit(title,(300,50))
 
-        glod_txt = self.font.render(f"金币{self.Player.gold}",True,(255,255,0))
+        glod_txt = self.font.render(f"金币{self.player.gold}",True,(255,255,0))
         screen.blit(glod_txt,(50,120))
 
         # 商品列表
         for i in enumerate(self.items_list):
-            y = 200 + i * 70 # 每个商品都占70像素高度
+            y = int(200 + i * 70) # 每个商品都占70像素高度
             color = (255,255,255)if i != self.selected_index else (255,215,0)
             prefix = ">" if i == self.selected_index else ""
 
@@ -63,12 +72,12 @@ class ShopScene:
     # 购买物品处理
     def buy_item(self):
         item = self.items_list[self.selected_index]
-        if self.Player.gold >= item.price:
-            self.Player.gold -= item.price
+        if self.player.gold >= item.price:
+            self.player.gold -= item.price
 
             # 把物品副本添加到背包
 
-            self.Player.inventory.append(item)
+            self.player.inventory.append(item)
             print(f"购买成功！获得了{item.name}")
 
         else :
