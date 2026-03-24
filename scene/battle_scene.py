@@ -1,9 +1,7 @@
 import pygame
 import random
-from mygame_RPG.entities.player_items import Item
 from mygame_RPG.entities.player import get_player
 from mygame_RPG.entities.Enemy import create_enemy
-from mygame_RPG.entities.player_skill import DamageSkill
 from mygame_RPG.data.skill_data import SKILLS
 
 
@@ -28,7 +26,13 @@ class \
 
 
         self.selected_index = 0 # 主菜单当前选中索引,
-        self.skills_index = 0 # 子菜单当前选中索引
+        self.skills_index = 0 # 技能子菜单当前选中索引
+        self.items_index = 0 # 道具子菜单索引
+
+        # 道具相关
+        self.usable_items = [] # 当前可用的物品列表
+        self.refresh_usable_items() # 初始化可用物品
+
         self.last_action = None # 储存玩家最后选择的行动
         self.current_menu = "MAIN" # 跟踪当前菜单
         self.damage_state = "NONE"
@@ -94,6 +98,20 @@ class \
                             self.battle_state = "ENEMY_TURN" if self.battle_state == "PLAYER_TURN" else "PLAYER_TURN"
                             print(f"调试：切换状态到{self.battle_state}")
 
+                    elif self.current_menu == "ITEMS":
+                        if event.key == pygame.K_UP:
+                            self.items_index =  (self.items_index - 1) % len (self.usable_items)
+                        elif event.key == pygame.K_DOWN:
+                            self.items_index = (self.items_index + 1 ) % len(self.usable_items)
+                        elif event.key == pygame.K_RETURN:
+                            self.use_selected_item()
+                        elif event.key == pygame.K_ESCAPE:
+                            self.current_menu = "MAIN"
+                        elif event.key == pygame.K_SPACE:
+                            self.battle_state = "ENEMY_TURN" if self.battle_state == "PLAYER_TURN" else "PLAYER_TURN"
+                            print(f"调试：切换状态到{self.battle_state}")
+
+
                 elif self.battle_state in ["VICTORY","DEFEAT"]:
                     if event.key == pygame.K_RETURN:
                         self.pending_scene_instruction = "to_world"
@@ -134,7 +152,15 @@ class \
             print("玩家选择了技能")
             self.current_menu = "SKILLS"
             self.skills_index = 0 # 重置技能默认选择第一个
+
+        if action == "道具":
+            print("玩家选择了道具")
+            self.current_menu = "ITEMS"
+            self.selected_index = 0
+            self.refresh_usable_items()
+
         return None
+
 
 
     def use_selected_skill(self):
@@ -157,6 +183,24 @@ class \
         self.battle_state = "ENEMY_TURN"
 
 
+    def refresh_usable_items(self):   # 从玩家背包中筛选出可用的物品
+        """从玩家包里筛选出需要的道具"""
+        self.usable_items = self.player.inventory[:]
+        if not self.usable_items:  # if是为了确保是列表
+            self.usable_items = []
+
+    def use_selected_item(self):
+        if not self.usable_items:
+            self.add_dialog_message ("没有可用物品")
+            self.current_menu = "MAIN"  # 如果背包没有可用物品的话就返回主菜单选项
+            return
+
+        item = self.usable_items[self.selected_index]
+        msg =  item.use(self.player) #  物品use方法定义时我们改成了接收玩家实例并返回消息
+        self.add_dialog_message(msg) # 物品使用后可能从背包移除，但是usable_items 列表需要同步更新
+        # 因为usable_items 是引用 player.inventory 所以同步，但是需要重新索引
+        self.refresh_usable_items() # 调整索引防止过界
+        
 
     def update(self):
         """根据战斗状态更新逻辑"""
@@ -201,6 +245,8 @@ class \
                 print(f"战斗胜利！ 获得了{self.enemy.gold}金币")
                 self.add_dialog_message(f"获得了{self.enemy.gold}个金币")
                 self.add_dialog_message("战斗胜利\n点击回车返回主世界")
+                return "VICTORY_to_world"
+
 
 
             elif self.player.hp <= 0 :
@@ -276,7 +322,6 @@ class \
         screen.blit(enemy_text,(500,50))
         screen.blit(player_enemy_txt,(50,150))
 
-
         # 绘制血条ui
         # 玩家血条位置
         bar_width = 200
@@ -312,7 +357,6 @@ class \
         pygame.draw.rect(screen, (0, 255, 255), (player_energy_x, player_energy_y, energy_current_width, player_energy_height))
         pygame.draw.rect(screen, (255, 255, 255), (player_energy_x, player_energy_y, player_energy_width, player_energy_height), 2)
 
-
         # 战斗菜单（玩家回合显示）
         if self.battle_state == "PLAYER_TURN":
             if self.current_menu == "MAIN":
@@ -331,6 +375,17 @@ class \
                     prefix = ">" if i == self.skills_index else ""
                     option_text = self.font.render(f"{prefix},{option}", True, color)
                     screen.blit(option_text, (menu_x, menu_y + i * 40))
+            elif self.current_menu == "ITEMS":
+                menu_y = 575
+                menu_x = 20
+                for i , item in enumerate(self.usable_items):
+                    color = (255,215,0) if  i == self.items_index else (200, 200, 200)
+                    prefix = ">" if i == self.items_index else ""
+                    item_text = self.font.render(f"{prefix},{item.name}", True, color)
+                    screen.blit(item_text, (menu_x, menu_y + i * 40))
+                    if not self.usable_items:
+                        empty_text = self.font.render(("没有可用物品"),True,(255,255,255))
+                        screen.blit(empty_text,(menu_x, menu_y))
 
 
                 # 绘制当前战斗显示

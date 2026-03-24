@@ -25,15 +25,16 @@ class ShopScene:
         self.title_font = pygame.font.Font(font_path,48)
         self.font = pygame.font.Font(font_path,36)
         self.small_font = pygame.font.Font(font_path,24)
-
         # 商品列表
         self.items = create_default_items()
         self.items_list = list(self.items.values())
         self.selected_index = 0 # 选中当前商品索引
 
+        self.pending_scene_instruction = None
+
     # draw绘制商店界面
     def draw(self,screen):
-        screen.fill((155,205,155)) # 背景
+        screen.fill((0,0,0)) # 背景
 
         title = self.title_font.render("商店",True,(255,210,0)) # 标题
         screen.blit(title,(300,50))
@@ -42,21 +43,21 @@ class ShopScene:
         screen.blit(glod_txt,(50,120))
 
         # 商品列表
-        for i in enumerate(self.items_list):
-            y = int(200 + i * 70) # 每个商品都占70像素高度
+        for i , item in enumerate(self.items_list):
+            y = 200 + i * 70 # 每个商品都占70像素高度
             color = (255,255,255)if i != self.selected_index else (255,215,0)
             prefix = ">" if i == self.selected_index else ""
 
             # 显示名称和价格
-            name_text = self.font.render(f"{prefix} {self.items.name} - {self.items.price}金币",True,color)
+            name_text = self.font.render(f"{prefix} {item.name} - {item.price}金币",True,color)
             screen.blit(name_text,(50,y))
 
             # 显示名字
-            desc_text = self.small_font.render(self.items.description,True , (200,200,200))
-            screen.blit(desc_text,(80,y+30))
+            desc_text = self.small_font.render(item.description,True , (200,200,200))
+            screen.blit(desc_text,(80,y + 30))
 
     # 按键事件处理
-    def handle_event(self,events):
+    def handle_events(self,events):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
@@ -66,8 +67,9 @@ class ShopScene:
                 elif event.key == pygame.K_RETURN:
                     self.buy_item()
                 elif event.key == pygame.K_ESCAPE:
-                    return "to_world"  # 按 ESC 返回世界场景
-                return None
+                   self.pending_scene_instruction = "to_world"  # 按 ESC 返回世界场景
+
+        return None
 
     # 购买物品处理
     def buy_item(self):
@@ -82,6 +84,14 @@ class ShopScene:
 
         else :
             print("金币不足")
+
+    # update传递数据给main
+    def update(self):
+        if self.pending_scene_instruction:
+            instruction = self.pending_scene_instruction
+            self.pending_scene_instruction = None
+            return instruction
+        return None
 
 
 

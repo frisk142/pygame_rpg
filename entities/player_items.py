@@ -1,6 +1,5 @@
 import pygame
 from mygame_RPG.entities.player import get_player
-
 class Item:
     """基础物品类"""
     def __init__(self, name, description, price, icon_path=None):
@@ -27,7 +26,7 @@ class HealingItem(Item):
         super().__init__(name, description, price, icon_path)
         self.heal_amount = heal_amount
 
-    def use(self):
+    def use(self,player):
         self.player.hp = min(self.player.hp + self.heal_amount, self.player.max_hp)
         # 从背包移除自身
         if self in self.player.inventory:
@@ -41,7 +40,7 @@ class ManaItem(Item):
         super().__init__(name, description, price, icon_path)
         self.mana_amount = mana_amount
 
-    def use(self):
+    def use(self,player):
         self.player.mp = min(self.player.mp + self.mana_amount, self.player.max_mp)
         if self in self.player.inventory:
             self.player.inventory.remove(self)
@@ -55,7 +54,7 @@ class StatBoostItem(Item):
         self.stat_type = stat_type   # "attack", "defense", "max_hp", "max_mp"
         self.boost_amount = boost_amount
 
-    def use(self):
+    def use(self,player):
         if self.stat_type == "attack":
             self.player.attack += self.boost_amount
         elif self.stat_type == "defense":
@@ -72,6 +71,9 @@ class StatBoostItem(Item):
         if self in self.player.inventory:
             self.player.inventory.remove(self)
         return f"使用了{self.name}，{self.stat_type}提升了{self.boost_amount}"
+
+    def __repr__(self):
+        return self.name
 
 
 def create_default_items():

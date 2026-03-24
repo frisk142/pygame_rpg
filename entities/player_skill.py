@@ -1,4 +1,3 @@
-
 class Skill: # 技能基类
     def __init__(self, name, mp_cost, description="",switch_turn=False):
         self.name = name

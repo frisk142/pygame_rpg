@@ -23,6 +23,9 @@ class Player(pygame.sprite.Sprite): # 定义一个名为player的自定义类，
         self.defense = 10
         self.items = []
 
+        # 玩家背包
+        self.inventory = []
+
     def update(self,keys):
         # 角色运动逻辑
         if keys[pygame.K_a]:
@@ -42,6 +45,7 @@ class Player(pygame.sprite.Sprite): # 定义一个名为player的自定义类，
             self.rect.top = 0
         if self.rect.bottom > self.screen_height:
             self.rect.bottom = self.screen_height
+
 
 
 player_instance = None
