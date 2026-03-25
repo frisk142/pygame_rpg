@@ -1,10 +1,5 @@
 import pygame
-from mygame_RPG.entities import player_items
-from mygame_RPG.entities.player import Player
 from mygame_RPG.entities.player_items import create_default_items
-from mygame_RPG.entities.player_items import HealingItem
-from mygame_RPG.entities.player_items import ManaItem
-from mygame_RPG.entities.player_items import StatBoostItem
 
 
 class ShopEntrance(pygame.sprite.Sprite): # 商店入口，创建商店精灵类

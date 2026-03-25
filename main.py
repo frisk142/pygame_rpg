@@ -14,7 +14,8 @@ def main():
 
     # 初始状态：探索场景
     player = create_player(400,400)
-    current_scene = world_scene(current_floor)
+    world = world_scene(current_floor)
+    current_scene = world
 
     running = True
     while running:
@@ -32,20 +33,26 @@ def main():
         # 处理场景切换请求
         if next_scene_request == "to_battle":
             if isinstance(current_scene,world_scene): # 获取探索场景遇到的敌人，并转递给战斗场景
-                current_scene = Battle_scene(current_scene.encountered_enemy)
+                current_scene = Battle_scene(world.encountered_enemy)
+
         elif next_scene_request == "to_shop":
             if isinstance(current_scene, world_scene):
                 current_scene = ShopScene(player)
+
         elif next_scene_request == "to_world":
             if isinstance(current_scene,Battle_scene):
-                current_scene = world_scene()
+                current_scene = world
+
             elif isinstance(current_scene, ShopScene):
-                current_scene = world_scene()
+                current_scene = world
                 current_scene.player.rect.center = (400,400)
+
         elif next_scene_request == "to_next_floor":
-            if isinstance(current_scene, Battle_scene):
+            if isinstance(current_scene, world_scene
+                          ):
                 current_floor += 1
-                current_scene = world_scene(current_floor)
+                world = world_scene(current_floor)
+                current_scene = world
 
         current_scene.draw(screen) # 绘制当前场景
         pygame.display.flip() # 刷新屏幕

@@ -10,7 +10,7 @@ class world_scene:
         self.all_sprites = pygame.sprite.Group() # 创建一个精灵组
         self.player = get_player() # 创建主角
         self.floor = floor
-        self.stair = Stair(x = self.stair.x , y = self.stair.y)
+        self.stair = None
 
         # 字体相关
         font_path = r"C:\Windows\Fonts\Deng.ttf"
@@ -37,21 +37,22 @@ class world_scene:
             self.enemy.update()
 
         # 碰撞检测
-        if pygame.sprite.collide_rect(self.player, self.enemy,):
-            self.encountered_enemy = self.enemy
-            if self.player.hp <= 0:
-                return None
-            return "to_battle"
-
-        if self.enemy and self.enemy.hp <= 0 and self.stair is None:
-            # 在随机位置附近生成楼梯入口
-            self.stair = (self.stair.x,self.stair.y)
-            self.all_sprites.add(self.stair)
-
-        # 如果楼梯存在，检测碰撞
-        if pygame.sprite.collide_rect(self.player, self.stair,):
+        if self.stair and pygame.sprite.collide_rect(self.player, self.stair,):
             return "to_next_floor"
 
+
+
+        if self.enemy and self.enemy.hp > 0 and pygame.sprite.collide_rect(self.player,self.enemy):
+            self.encountered_enemy = self.enemy
+            return "to_battle"
+
+        # 如果敌人死亡没有生成楼梯，则生成楼梯
+        if self.enemy and self.enemy.hp <= 0 and self.stair is None:
+            print("敌人死亡，生成楼梯，移除敌人")
+            self.enemy.kill() # 敌人死亡之后从精灵组抹除敌人实例
+            self.enemy = None
+            self.stair = Stair(self.player.rect.centerx,self.player.rect.centery - 90)
+            self.all_sprites.add(self.stair)
 
         if pygame.sprite.collide_rect(self.player, self.shop_scene):
             self.encountered_shop_scene = self.shop_scene

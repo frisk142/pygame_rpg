@@ -1,14 +1,13 @@
 import pygame
 import random
 from mygame_RPG.entities.player import get_player
-from mygame_RPG.entities.Enemy import create_enemy
 from mygame_RPG.data.skill_data import SKILLS
 
 
 class \
         Battle_scene:
     def __init__(self,encountered_enemy):
-        self.enemy = create_enemy() # 怪物信息
+        self.enemy = encountered_enemy  # 怪物信息
         self.player = get_player()
 
         self.display_player_hp = self.player.hp # 用于显示缓降落的ui条
